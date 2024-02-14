@@ -4,14 +4,19 @@ from aiogram.types import ContentType
 
 import message_texts as messages
 from data.config import bot
+from handlers.article_creation import article_info
 from keyboards.payment_confirmation import confirm_keyboard
 
 from state.payment import PaymentState
 
 
 async def payment_start(callback_query: types.CallbackQuery):
-    await callback_query.answer(cache_time=5)
-    await callback_query.message.answer(messages.PAYMENT_START, reply_markup=confirm_keyboard, parse_mode='HTML')
+    await bot.edit_message_text(
+        text=messages.PAYMENT_START,
+        chat_id=callback_query.message.chat.id,
+        message_id=callback_query.message.message_id,
+        reply_markup=confirm_keyboard,
+        parse_mode='HTML')
     await PaymentState.start.set()
 
 
@@ -25,6 +30,7 @@ async def payment_finish(message: types.Message, state: FSMContext):
     if message.content_type == ContentType.PHOTO:
         await message.answer(messages.PAYMENT_FINISH)
         await state.finish()
+        await article_info(message)
     else:
         await message.answer(messages.NOT_CORRECT_CHECK)
 
