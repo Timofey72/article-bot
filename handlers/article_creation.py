@@ -1,3 +1,4 @@
+import uuid
 from typing import Union
 
 from aiogram import Dispatcher, types
@@ -5,10 +6,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ContentType
 
 import message_texts as messages
-from data.config import bot
+from data.config import bot, MAIN_ADMIN
+from keyboards.article_confirmation import get_confirmation_keyboard
 from keyboards.photo import photo_keyboard
 
 from state.article import ArticleState
+from utils.article_dict import get_article_message
+from utils.articles_json import save_article_to_json
 
 
 async def start_article_creation(message: types.Message):
@@ -75,7 +79,7 @@ async def article_photo(message: types.Message, state: FSMContext):
         else:
             data['photos'].append(photo.file_id)
 
-    if len(data['photos']) == 3:
+    if len(data['photos']) == 10:
         await save_photos(message, state)
         return
 
@@ -89,11 +93,29 @@ async def add_photo(callback_query: types.CallbackQuery):
 
 async def save_photos(action_type: Union[types.CallbackQuery, types.Message], state: FSMContext):
     data = await state.get_data()
+    photos = data.get('photos')
+
+    if photos is None:
+        return
+
+    article_message = get_article_message(data)
+
+    media_group = []
+    for i, photo_id in enumerate(photos):
+        media_group.append(
+            types.InputMediaPhoto(media=photo_id, parse_mode='HTML', caption=article_message if i == 0 else ''))
 
     if type(action_type) is types.Message:
         await action_type.answer(messages.ARTICLE_PHOTO_SAVE)
     else:
         await action_type.message.answer(messages.ARTICLE_PHOTO_SAVE)
+
+    unique_id = str(uuid.uuid4())[:10]
+    save_article_to_json(unique_id, data)
+    keyboard = get_confirmation_keyboard(unique_id)
+
+    await bot.send_media_group(chat_id=MAIN_ADMIN[0], media=media_group)
+    await bot.send_message(chat_id=MAIN_ADMIN[0], text=messages.ARTICLE_PUBLISH, reply_markup=keyboard)
 
     await state.finish()
 
