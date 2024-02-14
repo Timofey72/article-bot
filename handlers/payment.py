@@ -4,7 +4,7 @@ from aiogram.types import ContentType
 
 import message_texts as messages
 from data.config import bot
-from handlers.article_creation import article_info
+from handlers.article_creation import start_article_creation
 from keyboards.payment_confirmation import confirm_keyboard
 
 from state.payment import PaymentState
@@ -30,7 +30,7 @@ async def payment_finish(message: types.Message, state: FSMContext):
     if message.content_type == ContentType.PHOTO:
         await message.answer(messages.PAYMENT_FINISH)
         await state.finish()
-        await article_info(message)
+        await start_article_creation(message)
     else:
         await message.answer(messages.NOT_CORRECT_CHECK)
 
