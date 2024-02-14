@@ -64,7 +64,7 @@ async def article_phone(message: types.Message, state: FSMContext):
 
 async def article_price(message: types.Message, state: FSMContext):
     price = message.text
-    if not price.isdigit():
+    if not price.isdigit() or len(price) > 6:
         await message.answer(messages.PRICE_FORMAT_ERROR)
         return
 
