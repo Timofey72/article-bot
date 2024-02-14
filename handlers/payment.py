@@ -30,7 +30,7 @@ async def payment_finish(message: types.Message, state: FSMContext):
     if message.content_type == ContentType.PHOTO:
         await message.answer(messages.PAYMENT_FINISH)
         await state.finish()
-        await start_article_creation(message)
+        await start_article_creation(message, message.photo[-1].file_id)
     else:
         await message.answer(messages.NOT_CORRECT_CHECK)
 

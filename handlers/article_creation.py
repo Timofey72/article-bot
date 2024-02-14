@@ -14,13 +14,22 @@ from state.article import ArticleState
 from utils.article_dict import get_article_message
 from utils.articles_json import save_article_to_json
 
+check_image_id: str = ''
 
-async def start_article_creation(message: types.Message):
+
+async def start_article_creation(message: types.Message, check: str = None):
+    global check_image_id
     await message.answer(messages.ARTICLE_DESCRIPTION, parse_mode='HTML')
     await ArticleState.description.set()
+    check_image_id = check
 
 
 async def article_description(message: types.Message, state: FSMContext):
+    global check_image_id
+    if check_image_id:
+        await state.update_data(check=check_image_id)
+        check_image_id = ''
+
     description = message.text
     if len(description) > 900:
         await message.answer(messages.DESCRIPTION_LIMIT)
@@ -94,6 +103,7 @@ async def add_photo(callback_query: types.CallbackQuery):
 async def save_photos(action_type: Union[types.CallbackQuery, types.Message], state: FSMContext):
     data = await state.get_data()
     photos = data.get('photos')
+    check = data.get('check', None)
 
     if photos is None:
         return
@@ -114,8 +124,10 @@ async def save_photos(action_type: Union[types.CallbackQuery, types.Message], st
     save_article_to_json(unique_id, data)
     keyboard = get_confirmation_keyboard(unique_id)
 
-    await bot.send_media_group(chat_id=MAIN_ADMIN[0], media=media_group)
-    await bot.send_message(chat_id=MAIN_ADMIN[0], text=messages.ARTICLE_PUBLISH, reply_markup=keyboard)
+    await bot.send_media_group(chat_id=MAIN_ADMIN, media=media_group)
+    if check is not None:
+        await bot.send_photo(chat_id=MAIN_ADMIN, photo=check, caption=messages.CHECK_TEXT)
+    await bot.send_message(chat_id=MAIN_ADMIN, text=messages.ARTICLE_PUBLISH, reply_markup=keyboard)
 
     await state.finish()
 
