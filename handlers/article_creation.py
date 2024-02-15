@@ -11,8 +11,7 @@ from keyboards.article_confirmation import get_confirmation_keyboard
 from keyboards.photo import photo_keyboard
 
 from state.article import ArticleState
-from utils.article_dict import get_article_message
-from utils.articles_json import save_article_to_json
+from utils.database.schemas.article import commands as article_model
 
 check_image_id: str = ''
 
@@ -53,7 +52,7 @@ async def article_city(message: types.Message, state: FSMContext):
 
 async def article_phone(message: types.Message, state: FSMContext):
     phone = message.text
-    if len(phone) > 14 or not phone.startswith('+7'):
+    if len(phone) > 14 or not phone.startswith('+7') or not phone.replace('+7', '').isdigit():
         await message.answer(messages.PHONE_FORMAT_ERROR)
         return
 
@@ -102,13 +101,17 @@ async def add_photo(callback_query: types.CallbackQuery):
 
 async def save_photos(action_type: Union[types.CallbackQuery, types.Message], state: FSMContext):
     data = await state.get_data()
+    description = data.get('description')
+    phone = data.get('phone')
+    city = data.get('city')
+    price = data.get('price')
     photos = data.get('photos')
     check = data.get('check', None)
 
+    article_message = messages.ARTICLE_TEMPLATE % (description, phone, city, price)
+
     if photos is None:
         return
-
-    article_message = get_article_message(data)
 
     media_group = []
     for i, photo_id in enumerate(photos):
@@ -120,9 +123,9 @@ async def save_photos(action_type: Union[types.CallbackQuery, types.Message], st
     else:
         await action_type.message.answer(messages.ARTICLE_PHOTO_SAVE)
 
-    unique_id = str(uuid.uuid4())[:10]
-    save_article_to_json(unique_id, data)
-    keyboard = get_confirmation_keyboard(unique_id)
+    username = action_type.from_user.id
+    article = await article_model.add_article(description, city, phone, price, photos, username)
+    keyboard = get_confirmation_keyboard(article.id)
 
     await bot.send_media_group(chat_id=MAIN_ADMIN, media=media_group)
     if check is not None:

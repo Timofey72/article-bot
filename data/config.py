@@ -11,4 +11,11 @@ ADMINS = str(os.getenv('ADMINS')).split(',')
 MAIN_ADMIN = int(ADMINS[0])
 CHANNEL_ID = str(os.getenv('CHANNEL_ID'))
 
+PG_NAME = str(os.getenv('PG_NAME'))
+PG_USER = str(os.getenv('PG_USER'))
+PG_PASS = str(os.getenv('PG_PASS'))
+PG_HOST = str(os.getenv('PG_HOST'))
+
+POSTGRES_URI = f'postgresql://{PG_USER}:{PG_PASS}@{PG_HOST}/{PG_NAME}'
+
 bot = Bot(token=BOT_TOKEN)

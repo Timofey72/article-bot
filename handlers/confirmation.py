@@ -1,22 +1,21 @@
 from aiogram import Dispatcher, types
 from data.config import bot, CHANNEL_ID
-from utils.article_dict import get_article_message
+import message_texts as messages
 
-from utils.articles_json import find_article_by_id_in_json, delete_article_by_id
+from utils.database.schemas.article import commands as article_model
 
 
 async def publish_article(callback_query: types.CallbackQuery):
     await callback_query.message.delete()
-    article_id = callback_query.data.replace('publish_', '')
-    article = find_article_by_id_in_json(article_id)
-    delete_article_by_id(article_id)
+    article_id = int(callback_query.data.replace('publish_', ''))
+    article = await article_model.select_article(article_id)
 
     if article is None:
         await callback_query.answer('Произошла ошибка при публикации')
         return
 
-    photos = article.get('photos')
-    article_message = get_article_message(article)
+    photos = article.photo
+    article_message = messages.ARTICLE_TEMPLATE % (article.description, article.phone, article.city, article.price)
 
     media_group = []
     for i, photo_id in enumerate(photos):
