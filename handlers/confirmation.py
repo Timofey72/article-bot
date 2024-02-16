@@ -1,6 +1,8 @@
 from aiogram import Dispatcher, types
+
 from data.config import bot, CHANNEL_ID
 import message_texts as messages
+from keyboards.article_confirmation import get_edit_article_keyboard
 
 from utils.database.schemas.article import commands as article_model
 
@@ -26,5 +28,13 @@ async def publish_article(callback_query: types.CallbackQuery):
     await callback_query.answer('Статья опубликована')
 
 
+async def edit_article(callback_query: types.CallbackQuery):
+    article_id = int(callback_query.data.replace('edit_', ''))
+    keyboard = get_edit_article_keyboard(article_id)
+    await bot.edit_message_reply_markup(callback_query.message.chat.id, callback_query.message.message_id,
+                                        reply_markup=keyboard)
+
+
 def register_confirmation_article(dp: Dispatcher):
     dp.register_callback_query_handler(publish_article, lambda c: c.data.startswith('publish_'))
+    dp.register_callback_query_handler(edit_article, lambda c: c.data.startswith('edit_'))

@@ -16,12 +16,12 @@ async def select_article(article_id: int):
 
 async def update_article(
         article_id: int, *, description: str = None, city: str = None, phone: str = None, price: int = None):
-    article = await Article.get(id=article_id)
+    article = await Article.get(article_id)
     if description:
-        await article.update(description=description)
+        await article.update(description=description).apply()
     if city:
-        await article.update(city=city)
+        await article.update(city=city).apply()
     if phone:
-        await article.update(phone=phone)
+        await article.update(phone=phone).apply()
     if price:
-        await article.update(price=int(price))
+        await article.update(price=int(price)).apply()
