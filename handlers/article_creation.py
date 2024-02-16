@@ -1,4 +1,3 @@
-import uuid
 from typing import Union
 
 from aiogram import Dispatcher, types
@@ -123,14 +122,17 @@ async def save_photos(action_type: Union[types.CallbackQuery, types.Message], st
     else:
         await action_type.message.answer(messages.ARTICLE_PHOTO_SAVE)
 
-    username = action_type.from_user.id
-    article = await article_model.add_article(description, city, phone, price, photos, username)
+    user_id = action_type.from_user.id
+    username = action_type.from_user.username
+    article = await article_model.add_article(description, city, phone, price, photos, user_id)
     keyboard = get_confirmation_keyboard(article.id)
 
     await bot.send_media_group(chat_id=MAIN_ADMIN, media=media_group)
     if check is not None:
         await bot.send_photo(chat_id=MAIN_ADMIN, photo=check, caption=messages.CHECK_TEXT)
-    await bot.send_message(chat_id=MAIN_ADMIN, text=messages.ARTICLE_PUBLISH, reply_markup=keyboard)
+    await bot.send_message(chat_id=MAIN_ADMIN, text=messages.ARTICLE_PUBLISH % (username, user_id),
+                           reply_markup=keyboard,
+                           parse_mode='HTML')
 
     await state.finish()
 
