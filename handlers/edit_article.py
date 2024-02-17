@@ -47,7 +47,7 @@ async def edit_article_data(message: types.Message, state: FSMContext):
     text = message.text
 
     if edit_type == 'description':
-        if len(text) > 900:
+        if len(text) > 890:
             await message.answer(messages.DESCRIPTION_LIMIT)
             return
         await article_model.update_article(article_id=article_id, description=text)
@@ -62,7 +62,7 @@ async def edit_article_data(message: types.Message, state: FSMContext):
             return
         await article_model.update_article(article_id=article_id, phone=text)
     elif edit_type == 'price':
-        if not text.isdigit() or len(text) > 6:
+        if not text.isdigit() or len(text) > 14:
             await message.answer(messages.PRICE_FORMAT_ERROR)
             return
         await article_model.update_article(article_id=article_id, price=text)

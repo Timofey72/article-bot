@@ -1,6 +1,6 @@
 from aiogram import Dispatcher, types
 
-from data.config import bot, CHANNEL_ID
+from data.config import bot, CHANNEL_ID, BOT_NAME
 import message_texts as messages
 from keyboards.article_confirmation import get_edit_article_keyboard
 
@@ -17,7 +17,8 @@ async def publish_article(callback_query: types.CallbackQuery):
         return
 
     photos = article.photo
-    article_message = messages.ARTICLE_TEMPLATE % (article.description, article.phone, article.city, article.price)
+    article_message = messages.ARTICLE_TEMPLATE % (
+        article.description, article.price, article.city, article.phone, BOT_NAME)
 
     media_group = []
     for i, photo_id in enumerate(photos):

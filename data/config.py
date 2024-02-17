@@ -10,6 +10,7 @@ BOT_TOKEN = str(os.getenv('BOT_TOKEN'))
 ADMINS = str(os.getenv('ADMINS')).split(',')
 MAIN_ADMIN = int(ADMINS[0])
 CHANNEL_ID = str(os.getenv('CHANNEL_ID'))
+BOT_NAME = str(os.getenv('BOT_NAME'))
 
 PG_NAME = str(os.getenv('PG_NAME'))
 PG_USER = str(os.getenv('PG_USER'))
