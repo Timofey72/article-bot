@@ -19,6 +19,7 @@ PG_HOST = str(os.getenv('PG_HOST'))
 CARD = str(os.getenv('CARD'))
 PRICE = str(os.getenv('PRICE'))
 BANK = str(os.getenv('BANK'))
+ADMIN_URL = str(os.getenv('ADMIN_URL'))
 
 POSTGRES_URI = f'postgresql://{PG_USER}:{PG_PASS}@{PG_HOST}/{PG_NAME}'
 
