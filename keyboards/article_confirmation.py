@@ -6,6 +6,7 @@ def get_confirmation_keyboard(article_id: int) -> InlineKeyboardMarkup:
     buttons = [
         InlineKeyboardButton("Опубликовать", callback_data=f'publish_{article_id}'),
         InlineKeyboardButton("Редактировать", callback_data=f'edit_{article_id}'),
+        InlineKeyboardButton("Заблокировать пользователя", callback_data=f'block_user_{article_id}'),
     ]
     keyboard.add(*buttons)
     return keyboard

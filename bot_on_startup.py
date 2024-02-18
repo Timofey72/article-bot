@@ -7,11 +7,14 @@ from handlers import start, payment, article_creation, free, admin, confirmation
     get_user_id, newsletter
 
 from utils.database import db_gino
+from utils.set_bot_commands import set_default_commands
 
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 
 async def on_startup(dispatcher):
+    await set_default_commands(dispatcher)
+
     start.register_start(dispatcher)
     admin.register_admin(dispatcher)
     newsletter.register_newsletter(dispatcher)

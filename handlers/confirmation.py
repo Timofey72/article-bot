@@ -5,6 +5,7 @@ import message_texts as messages
 from keyboards.article_confirmation import get_edit_article_keyboard
 
 from utils.database.schemas.article import commands as article_model
+from utils.database.schemas.user import commands as user_model
 
 
 async def publish_article(callback_query: types.CallbackQuery):
@@ -36,6 +37,15 @@ async def edit_article(callback_query: types.CallbackQuery):
                                         reply_markup=keyboard)
 
 
+async def block_user(callback_query: types.CallbackQuery):
+    article_id = int(callback_query.data.replace('block_user_', ''))
+    user_id = (await article_model.select_article(article_id)).user_id
+    await user_model.update_user_ban(user_id=user_id, ban_status=True)
+    await bot.edit_message_reply_markup(callback_query.message.chat.id, callback_query.message.message_id)
+    await callback_query.message.answer(messages.USER_BLOCKED)
+
+
 def register_confirmation_article(dp: Dispatcher):
     dp.register_callback_query_handler(publish_article, lambda c: c.data.startswith('publish_'))
     dp.register_callback_query_handler(edit_article, lambda c: c.data.startswith('edit_'))
+    dp.register_callback_query_handler(block_user, lambda c: c.data.startswith('block_user_'))

@@ -27,6 +27,11 @@ async def select_user(user_id: int):
     return user
 
 
+async def update_user_ban(user_id: int, ban_status: bool = True):
+    user = await User.get(user_id)
+    await user.update(is_blocked=ban_status).apply()
+
+
 async def count_users() -> int:
     total = await db.func.count(User.id).gino.scalar()
     return total

@@ -9,7 +9,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 from data.config import MODE
-from utils.middleware import AlbumMiddleware
+from utils.middleware import AlbumMiddleware, UserBannedMiddleware
 
 # logging settings
 log_path = 'logs/bot.log'
@@ -28,6 +28,7 @@ if __name__ == '__main__':
         try:
             from bot_on_startup import dp, on_startup
 
+            dp.middleware.setup(UserBannedMiddleware())
             dp.middleware.setup(AlbumMiddleware())
             executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
             logging.info('Bot stopped')
@@ -45,6 +46,7 @@ if __name__ == '__main__':
             try:
                 from bot_on_startup import dp, on_startup
 
+                dp.middleware.setup(UserBannedMiddleware())
                 dp.middleware.setup(AlbumMiddleware())
                 executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
                 logging.info('Bot stopped')
