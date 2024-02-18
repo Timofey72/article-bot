@@ -16,6 +16,10 @@ PG_USER = str(os.getenv('PG_USER'))
 PG_PASS = str(os.getenv('PG_PASS'))
 PG_HOST = str(os.getenv('PG_HOST'))
 
+CARD = str(os.getenv('CARD'))
+PRICE = str(os.getenv('PRICE'))
+BANK = str(os.getenv('BANK'))
+
 POSTGRES_URI = f'postgresql://{PG_USER}:{PG_PASS}@{PG_HOST}/{PG_NAME}'
 
 bot = Bot(token=BOT_TOKEN)

@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ContentType
 
 import message_texts as messages
-from data.config import bot
+from data.config import bot, PRICE, CARD, BANK
 from handlers.article_creation import start_article_creation
 from keyboards.payment_confirmation import confirm_keyboard
 
@@ -12,7 +12,7 @@ from state.payment import PaymentState
 
 async def payment_start(callback_query: types.CallbackQuery):
     await bot.edit_message_text(
-        text=messages.PAYMENT_START,
+        text=messages.PAYMENT_START % (PRICE, CARD, BANK),
         chat_id=callback_query.message.chat.id,
         message_id=callback_query.message.message_id,
         reply_markup=confirm_keyboard,
