@@ -8,7 +8,6 @@ load_dotenv()
 MODE = str(os.getenv('MODE'))
 BOT_TOKEN = str(os.getenv('BOT_TOKEN'))
 ADMINS = str(os.getenv('ADMINS')).split(',')
-MAIN_ADMIN = int(ADMINS[0])
 CHANNEL_ID = str(os.getenv('CHANNEL_ID'))
 BOT_NAME = str(os.getenv('BOT_NAME'))
 

@@ -1,13 +1,12 @@
-from typing import Union, List
+from typing import List
 
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ContentType
 
 import message_texts as messages
-from data.config import bot, MAIN_ADMIN, BOT_NAME
+from data.config import bot, BOT_NAME, ADMINS
 from keyboards.article_confirmation import get_confirmation_keyboard
-from keyboards.photo import photo_keyboard
 
 from state.article import ArticleState
 from utils.database.schemas.article import commands as article_model
@@ -121,12 +120,13 @@ async def save_photos(message: types.Message, state: FSMContext):
     article = await article_model.add_article(description, city, phone, price, photos, user_id)
     keyboard = get_confirmation_keyboard(article.id)
 
-    await bot.send_media_group(chat_id=MAIN_ADMIN, media=media_group)
-    if check is not None:
-        await bot.send_photo(chat_id=MAIN_ADMIN, photo=check, caption=messages.CHECK_TEXT)
-    await bot.send_message(chat_id=MAIN_ADMIN, text=messages.ARTICLE_PUBLISH % (username, user_id),
-                           reply_markup=keyboard,
-                           parse_mode='HTML')
+    for admin_id in ADMINS:
+        await bot.send_media_group(chat_id=int(admin_id), media=media_group)
+        if check is not None:
+            await bot.send_photo(chat_id=int(admin_id), photo=check, caption=messages.CHECK_TEXT)
+        await bot.send_message(chat_id=int(admin_id), text=messages.ARTICLE_PUBLISH % (username, user_id),
+                               reply_markup=keyboard,
+                               parse_mode='HTML')
 
     await state.finish()
 
