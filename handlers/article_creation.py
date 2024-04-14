@@ -82,10 +82,11 @@ async def article_photo(message: types.Message, state: FSMContext, album: List[t
         await message.answer(messages.PHOTO_ERROR)
         return
 
-    for i, obj in enumerate(album):
+    for obj in album:
         if obj.photo:
             file_id = obj.photo[-1].file_id
             photos.append(file_id)
+
     if len(photos) == 0:
         await message.answer(messages.PHOTO_ERROR)
         return
@@ -121,12 +122,15 @@ async def save_photos(message: types.Message, state: FSMContext):
     keyboard = get_confirmation_keyboard(article.id)
 
     for admin_id in ADMINS:
-        await bot.send_media_group(chat_id=int(admin_id), media=media_group)
-        if check is not None:
-            await bot.send_photo(chat_id=int(admin_id), photo=check, caption=messages.CHECK_TEXT)
-        await bot.send_message(chat_id=int(admin_id), text=messages.ARTICLE_PUBLISH % (username, user_id),
-                               reply_markup=keyboard,
-                               parse_mode='HTML')
+        try:
+            await bot.send_media_group(chat_id=int(admin_id), media=media_group)
+            if check is not None:
+                await bot.send_photo(chat_id=int(admin_id), photo=check, caption=messages.CHECK_TEXT)
+            await bot.send_message(chat_id=int(admin_id), text=messages.ARTICLE_PUBLISH % (username, user_id),
+                                   reply_markup=keyboard,
+                                   parse_mode='HTML')
+        except Exception:
+            pass
 
     await state.finish()
 
